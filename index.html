@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Interactive fluid-analogy visualizer for mechanics: force as momentum current, work as energy current, compression, and levers.">
+  <title>Momentum &amp; Energy Flow</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338dcf7' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M6 11l6-6 6 6'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div id="stage">
+    <canvas id="overlayCanvas" aria-label="Interactive physics scene. Drag objects, lever handle, or fulcrum directly."></canvas>
+    <canvas id="glCanvas" aria-hidden="true"></canvas>
+  </div>
+
+  <!-- Explicit fail-fast error banner if WebGL 2 is unavailable -->
+  <div id="webglFail" class="webgl-fail" role="alert" hidden></div>
+
+  <!-- Prominent Axis / Charge Indicator & Signed Glow Scale -->
+  <div class="axis-badge" id="axisBadge" data-mode="z" aria-live="polite">
+    <div class="axis-arrow-box">
+      <svg id="axisIcon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 19V5M6 11l6-6 6 6"/>
+      </svg>
+    </div>
+    <div class="axis-meta">
+      <span class="axis-title" id="axisTitle">+z Momentum Fluid</span>
+      <span class="axis-sub" id="axisSub">Upward charge · flows via compression</span>
+      <div class="axis-scale" id="axisScale">
+        <span id="scaleLeftLabel">−z deficit</span>
+        <span class="scale-bar" aria-hidden="true"></span>
+        <span id="scaleRightLabel">+z surplus</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Single-Fluid Segmented Toggle -->
+  <header class="top-bar">
+    <div class="fluid-seg" id="fluidSeg" role="radiogroup" aria-label="Fluid Field View" data-mode="z">
+      <div class="seg-thumb" aria-hidden="true"></div>
+      <button type="button" role="radio" data-fluid="z" aria-checked="true">
+        <span class="glyph">↑</span>
+        <span>z-momentum</span>
+      </button>
+      <button type="button" role="radio" data-fluid="energy" aria-checked="false">
+        <span class="glyph">⚡</span>
+        <span>energy</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Quiet Editorial Caption & Contextual Minimal Controls -->
+  <div class="bottom-dock">
+    <p class="caption" id="caption"></p>
+    <div class="controls-bar" id="controlsBar"></div>
+  </div>
+
+  <!-- Bottom-Left: Chapter Picker Button & Frosted Popover -->
+  <button class="corner-btn pick-btn" id="pickBtn" aria-expanded="false" aria-controls="pickerPanel" aria-label="Choose Chapter" title="Chapters [1–4]">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h10"/>
+    </svg>
+  </button>
+
+  <div class="panel picker-panel" id="pickerPanel" role="dialog" aria-label="Chapters" hidden>
+    <div class="panel-head">
+      <h2>Chapters</h2>
+      <button class="close-mini" id="closePickerBtn" aria-label="Close">✕</button>
+    </div>
+    <ul class="chapter-list" id="chapterList"></ul>
+  </div>
+
+  <!-- Top-Right (or Mobile Floating): High-Level Circuit Analogy Overlay -->
+  <div class="panel circuit-panel" id="circuitPanel" role="region" aria-label="Electric Circuit Analogy" hidden>
+    <div class="panel-head">
+      <h2>Electric Circuit Analogy</h2>
+      <button class="close-mini" id="closeCircuitBtn" aria-label="Close">✕</button>
+    </div>
+    <canvas id="circuitCanvas"></canvas>
+  </div>
+
+  <!-- Bottom-Right: Minimalist Theme & Notes Button -->
+  <button class="corner-btn menu-btn" id="menuBtn" aria-expanded="false" aria-controls="optionsPanel" aria-label="Appearance and Notes" title="Theme & Notes">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+  </button>
+
+  <div class="panel options-panel" id="optionsPanel" role="dialog" aria-label="Appearance and Notes" hidden>
+    <div class="panel-head">
+      <h2>View &amp; Controls</h2>
+      <button class="close-mini" id="closeOptionsBtn" aria-label="Close">✕</button>
+    </div>
+    <div class="opt-row">
+      <span>Palette</span>
+      <button class="pill-btn active" id="themeToggleBtn" type="button">Switch to Light Paper</button>
+    </div>
+    <p class="opt-note">
+      Drag blocks, weights, the Class-1 lever handle, or the fulcrum directly on the canvas. Press <b>Tab</b> (or <b>F</b>) to flip between <i>↑ z-momentum</i> and <i>⚡ energy</i>, and <b>1–4</b> to switch chapters.
+    </p>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
